@@ -55,5 +55,5 @@ To use the tool, you need a VirusTotal API key. You can obtain one by registerin
 
 ## 📝 Notes
 
-- ⏲️ The tool includes a 10-second delay when fetching results to comply with VirusTotal's rate limits.
+- ⏲️ The tool includes a 100-second delay when fetching results to comply with VirusTotal's rate limits.
 - 😊 If you have an idea how I can improve the code or you can give advice, write to me! 
