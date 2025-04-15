@@ -35,12 +35,13 @@ class VirusScanner:
      def __init__(self, interface):
         self.interface = interface
         logging.basicConfig(format=("%(asctime)s - %(message)s"), datefmt="[+]%Y-%d-%m %H:%M:%S")
+        logging.basicConfig(level=logging.INFO)
 
         try:
             while True:
                 print(f"{self.interface.color_yellow}[+]P.S: To exit the program press Ctrl+C{self.interface.color_reset}")
                 print(f"{self.interface.color_yellow}[+]Path not entered. P.S: To update your Api-key, enter: '0'{self.interface.color_reset}")
-                self.name_file_for_api = input("[+]Enter the path where your file with api-key stored: ").strip('""').lstrip("& ").strip("''")
+                self.name_file_for_api = input("[+]Enter the path where your file with api-key stored: ").strip("''").strip("''").lstrip("' ").lstrip("& ").rstrip(" '")
                
                 if self.name_file_for_api == "0":
                     print(f"{self.interface.color_yellow}[+]Skipping Api-key setup...{self.interface.color_reset}")
@@ -81,7 +82,6 @@ class VirusScanner:
             logging.error(f"{self.interface.color_red}[+]Error! make sure you entered the correct Api-key or path to it{self.interface.color_reset}")
         except OSError as e:
             logging.error(f"{self.interface.color_red}[+]Error! Check your Api file, make sure it is definitely a api file: {e}{self.interface.color_reset}")
-
         except UnicodeDecodeError:
             logging.error(f"{self.interface.color_red}[+]Error! make sure your are sending a text file{self.interface.color_reset}")
 
@@ -91,11 +91,15 @@ class VirusScanner:
             url_users = input(f"{self.interface.color_yellow}[+]Enter url: {self.interface.color_reset}")
             url_main = "https://www.virustotal.com/api/v3/urls"
             response_post = requests.post(url_main, headers={"x-apikey":self.user_api_key}, data={"url":url_users})
-            time.sleep(20)
-            logging.info("Loading...")
-
             id_users = response_post.json().get('data').get('id')
             response_get = requests.get(f"https://www.virustotal.com/api/v3/analyses/{id_users}", headers={"x-apikey":self.user_api_key})
+            status_url = response_get.json().get('data',{}).get('attributes',{}).get('status')
+            print("[+]Loading......")
+
+            while status_url != "completed":
+                time.sleep(20)
+                response_get = requests.get(f"https://www.virustotal.com/api/v3/analyses/{id_users}", headers={"x-apikey":self.user_api_key})
+                status_url = response_get.json().get('data',{}).get('attributes',{}).get('status')
             status = response_get.json()
             stats = status.get('data').get('attributes').get('stats')
             malicious = stats.get('malicious')
@@ -112,35 +116,38 @@ class VirusScanner:
         except AttributeError:
             logging.error(f"{self.interface.color_red}[+]Error! check the api key and the path to it, and also make sure that you entered the correct data{self.interface.color_reset}")
         except requests.exceptions.ConnectionError: 
-            logging.error(f"{self.interface.color_red}[+]Error! make sure you have a connection {self.interface.color_reset}")
-
+            logging.error(f"{self.interface.color_red}[+]Error! make sure you have a connection {self.interface.color_reset}")   
+     
      def scan_file(self):
         """Checks files for malware"""
         try:
             user_file = input(f"{self.interface.color_yellow}[+]Enter the path to your file: {self.interface.color_reset}").strip("''").lstrip("' ").rstrip(" '")
             url_files_virsus = "https://www.virustotal.com/api/v3/files"
-
             with open (user_file, "rb") as file:
                 response = requests.post(url_files_virsus, headers={"x-apikey":self.user_api_key}, files={"file": file})
-
+            
             id_file = response.json().get('data').get('id')
             url_files_id = f"https://www.virustotal.com/api/v3/analyses/{id_file}"
-            logging.info("Loading...")
-            time.sleep(100)
-          
             response_get = requests.get(url_files_id, headers={"x-apikey":self.user_api_key})
-            if response_get.status_code == 200:
-                analyses_virsus = response_get.json().get('data').get('attributes').get('stats')
-                file_mailcious = analyses_virsus.get('malicious')
-                file_suspicious = analyses_virsus.get('suspicious')
-
-                if file_mailcious == 0 and file_suspicious == 0:
-                    print(f"[+]Malicious not found✅: {self.interface.color_green}{file_mailcious}{self.interface.color_reset}")
-                    print(f"[+]Suspicious not found✅: {self.interface.color_green}{file_suspicious}{self.interface.color_reset}")
-                elif file_mailcious > 0:
-                    print(f"[+]Malicious found⚠️: {self.interface.color_red}{file_mailcious}{self.interface.color_reset}")
-                elif file_suspicious > 0:
-                    print(f"[+]Suspicious found⚠️: {self.interface.color_red}{file_suspicious}{self.interface.color_reset}")
+            status_file = response_get.json().get('data',{}).get('attributes',{}).get('status')
+            logging.basicConfig(level=logging.INFO)
+            print("[+]Loading......")
+            
+            while status_file != "completed":
+                time.sleep(10)
+                response_get = requests.get(url_files_id, headers={"x-apikey":self.user_api_key})
+                status_file = response_get.json().get('data',{}).get('attributes',{}).get('status')
+            analyses_virsus = response_get.json().get('data').get('attributes').get('stats')
+            file_mailcious = analyses_virsus.get('malicious')
+            file_suspicious = analyses_virsus.get('suspicious')
+            
+            if file_mailcious == 0 and file_suspicious == 0:
+                print(f"[+]Malicious not found✅: {self.interface.color_green}{file_mailcious}{self.interface.color_reset}")
+                print(f"[+]Suspicious not found✅: {self.interface.color_green}{file_suspicious}{self.interface.color_reset}")
+            elif file_mailcious > 0:
+                print(f"[+]Malicious found⚠️: {self.interface.color_red}{file_mailcious}{self.interface.color_reset}")
+            elif file_suspicious > 0:
+                print(f"[+]Suspicious found⚠️: {self.interface.color_red}{file_suspicious}{self.interface.color_reset}")
         
         except FileNotFoundError as e:
             logging.error(f"{self.interface.color_red}[+]File not found: {self.interface.color_reset}{self.name_file_for_api}{self.interface.color_reset}")
@@ -148,6 +155,8 @@ class VirusScanner:
             logging.error(f"{self.interface.color_red}[+]Error! make sure you have a connection {self.interface.color_reset}")
         except OSError as e:
             logging.error(f"{self.interface.color_red}[+]Error! Check your Api file, make sure it is definitely a api file: {e}{self.interface.color_reset}") 
+        except AttributeError:
+            logging.error(f"{self.interface.color_red}[+]Error! check the api key and the path to it, and also make sure that you entered the correct data{self.interface.color_reset}")    
 
      def cheack_api_limits(self):
         """Checks ip limit"""
