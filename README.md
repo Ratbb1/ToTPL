@@ -1,6 +1,6 @@
-# ToTPL - VirusTotal API Scanner 🏱🏹
+# Totpl - вирустотальный сканер API 🏱🏹
 
-## 🚀 Overview
+## 🚀 Обзор
 
 ToTPL is a Python-based command-line tool that interacts with the VirusTotal API to scan URLs and files for potential threats. It also allows users to check their API key limits.
 
@@ -16,15 +16,15 @@ ToTPL is a Python-based command-line tool that interacts with the VirusTotal API
 1. Clone the repository:
    ```sh
    git clone https://github.com/Ratbb1/ToTPL
-   cd ToTPL
+   CD Totpl
    ```
 2. Install the required dependencies:
    ```sh
-   pip install -r requirements.txt
+   PIP установка -R TEDS.TXT
    ```
    If the command above doesn't work (e.g., on some Linux systems), use:
    ```sh
-   pip3 install --break-system-packages -r requirements.txt
+   Установка PIP3-Break-System-Packages -R TEDS.TXT
    ```
 
 ## 🛠 Usage
@@ -46,14 +46,13 @@ Upon running, you will see an interface with the following options:
 
 ### 🔑 API Key
 
-To use the tool, you need a VirusTotal API key. You can obtain one by registering at [VirusTotal](https://www.virustotal.com/).
+To use the tool, you need a VirusTotal API key. You can obtain one by registering at [Вирустотальный](https://www.virustotal.com/).
 
 ## ⚠️ Error Handling
 
 - 🚫 Incorrect input or missing API key will trigger error messages.
 - ⏳ API limit exceeded responses are handled properly.
 
-## 📝 Notes
+## 📝 Примечания
 
-- ⏲️ The tool includes a 100-second delay when fetching results to comply with VirusTotal's rate limits.
 - 😊 If you have an idea how I can improve the code or you can give advice, write to me! 
